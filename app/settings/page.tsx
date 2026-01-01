@@ -2,7 +2,10 @@
 
 import React from 'react';
 
+import { useUser } from '@/context/UserContext';
+
 const Settings = () => {
+    const { user, updateUser } = useUser();
     return (
         <div className="max-w-2xl">
             <header className="mb-10">
@@ -13,12 +16,12 @@ const Settings = () => {
             <div className="space-y-6">
                 <Section title="Profile Information">
                     <div className="flex items-center space-x-6 mb-6">
-                        <div className="w-20 h-20 rounded-full bg-decode-blue-3 flex items-center justify-center text-3xl font-bold ring-4 ring-white/10">U</div>
+                        <div className="w-20 h-20 rounded-full bg-decode-blue-3 flex items-center justify-center text-3xl font-bold ring-4 ring-white/10">{user.name.charAt(0)}</div>
                         <button className="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition text-sm font-semibold shadow-sm hover:shadow-md">Change Avatar</button>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Display Name" defaultValue="User Name" />
-                        <Input label="Email" defaultValue="user@example.com" />
+                        <Input label="Display Name" defaultValue={user.name} onChange={(val) => updateUser({ name: val })} />
+                        <Input label="Email" defaultValue={user.email} onChange={(val) => updateUser({ email: val })} />
                     </div>
                 </Section>
 
@@ -48,10 +51,15 @@ const Section = ({ title, children }: { title: string, children: React.ReactNode
     </div>
 );
 
-const Input = ({ label, defaultValue }: { label: string, defaultValue: string }) => (
+const Input = ({ label, defaultValue, onChange }: { label: string, defaultValue: string, onChange?: (val: string) => void }) => (
     <div>
         <label className="block text-sm font-medium text-blue-200 mb-1">{label}</label>
-        <input type="text" defaultValue={defaultValue} className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-decode-accent/50 transition-colors" />
+        <input
+            type="text"
+            defaultValue={defaultValue}
+            onChange={(e) => onChange?.(e.target.value)}
+            className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-decode-accent/50 transition-colors"
+        />
     </div>
 );
 

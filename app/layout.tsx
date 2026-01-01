@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/layout/Sidebar";
 import PageWrapper from "@/components/layout/PageWrapper";
+import { UserProvider } from "@/context/UserContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 

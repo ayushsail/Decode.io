@@ -34,7 +34,7 @@ export default function Home() {
             </div>
             <h4 className="text-2xl font-bold mb-3 tracking-wide">Daily Challenge</h4>
             <p className="text-center text-blue-100/70 mb-10 max-w-xs leading-relaxed font-medium">Complete the daily logic puzzle to keep your streak alive.</p>
-            <NextLink href="/puzzles" className='w-full text-center'>
+            <NextLink href="/puzzles/1" className='w-full text-center'>
               <Button fullWidth className="shadow-premium">Start Now</Button>
             </NextLink>
           </div>

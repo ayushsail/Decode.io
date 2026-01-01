@@ -2,15 +2,9 @@
 
 import React from 'react';
 
-const Leaderboard = () => {
-    const users = [
-        { rank: 1, name: "Alex Chen", xp: "15,420", country: "🇺🇸" },
-        { rank: 2, name: "Maria Garcia", xp: "14,850", country: "🇪🇸" },
-        { rank: 3, name: "Yuki Tanaka", xp: "14,200", country: "🇯🇵" },
-        { rank: 4, name: "Sarah Jones", xp: "13,900", country: "🇬🇧" },
-        { rank: 5, name: "User Name (You)", xp: "12,100", country: "🇨🇦", highlight: true },
-    ];
+import { USERS } from '../data';
 
+const Leaderboard = () => {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10 text-center">
@@ -25,7 +19,7 @@ const Leaderboard = () => {
                     <div className="col-span-4 text-right">XP Gained</div>
                 </div>
 
-                {users.map((user) => (
+                {USERS.map((user) => (
                     <div key={user.rank} className={`grid grid-cols-12 gap-4 p-6 items-center ${user.highlight ? 'bg-cyan-500/10 border-l-4 border-decode-accent' : 'hover:bg-white/5 border-l-4 border-transparent'} transition-colors`}>
                         <div className="col-span-2 text-center font-bold text-xl">
                             {user.rank === 1 ? '🥇' : user.rank === 2 ? '🥈' : user.rank === 3 ? '🥉' : `#${user.rank}`}

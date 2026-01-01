@@ -4,9 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Puzzle, Trophy, Settings } from 'lucide-react';
+import { useUser } from '@/context/UserContext';
 
 const Sidebar = () => {
     const pathname = usePathname();
+    const { user } = useUser();
     const isActive = (path: string) => pathname === path;
 
     return (
@@ -40,11 +42,11 @@ const Sidebar = () => {
                 <div className="px-6 mt-auto mb-6">
                     <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer border border-white/5 group">
                         <div className="w-10 h-10 rounded-full bg-decode-blue-3 flex items-center justify-center font-bold text-lg text-shadow ring-2 ring-transparent group-hover:ring-white/20 transition-all shrink-0">
-                            U
+                            {user.name.charAt(0)}
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-sm font-semibold truncate group-hover:text-white transition-colors">User Name</p>
-                            <p className="text-xs text-blue-200/70">Level 5 Solver</p>
+                            <p className="text-sm font-semibold truncate group-hover:text-white transition-colors">{user.name}</p>
+                            <p className="text-xs text-blue-200/70">Level {user.level} Solver</p>
                         </div>
                     </div>
                 </div>

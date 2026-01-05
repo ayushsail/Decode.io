@@ -15,11 +15,20 @@ export const PUZZLES = [
         difficulty: "Hard",
         category: "Algorithms",
         xp: 500,
-        description: "Given a list of cities and the distances between each pair of cities, what is the shortest possible route that visits each city exactly once and returns to the origin city?",
+        description: "Given a set of cities and distance, find the shortest route in C using optimal memory.",
         examples: [
-            { input: "distances = {{0, 10, 15, 20}, {10, 0, 35, 25}, ...}, n = 4", output: "80" }
+            { input: "distances = {{0, 10, 15, 20}, {10, 0, 35, 25}...}", output: "80" }
         ],
-        starterCode: "#include <stdio.h>\n#include <limits.h>\n\n// Returns the minimum cost to visit all cities\nint solveTSM(int **distances, int n) {\n    // Your code here\n    return 0;\n}"
+        starterCode: `#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+// Solver function
+// Ensure you free any dynamically allocated memory!
+int solveTSM(int **distances, int n) {
+    // Write your C solution here
+    return 0;
+}`
     },
     {
         id: "2",
@@ -27,19 +36,38 @@ export const PUZZLES = [
         difficulty: "Hard",
         category: "Data Structures",
         xp: 300,
-        description: "A path in a binary tree is a sequence of nodes where each pair of adjacent nodes in the sequence has an edge connecting them. Find the maximum path sum.",
+        description: "Find the maximum path sum in a binary tree. Focus on pointer manipulation.",
         examples: [],
-        starterCode: "#include <stdio.h>\n\nstruct TreeNode {\n    int val;\n    struct TreeNode *left;\n    struct TreeNode *right;\n};\n\nint maxPathSum(struct TreeNode* root) {\n    // Your code here\n    return 0;\n}"
+        starterCode: `#include <stdio.h>
+#include <stdlib.h>
+
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+};
+
+int maxPathSum(struct TreeNode* root) {
+    // Handle NULL pointers safely
+    return 0;
+}`
     },
     {
         id: "3",
-        title: "Median of Two Sorted Arrays",
-        difficulty: "Hard",
-        category: "Pointers & Arrays",
+        title: "Memory Leak Detector",
+        difficulty: "Medium",
+        category: "Memory Management",
         xp: 450,
-        description: "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.",
+        description: "Analyze the provided pointer operations and return the total number of leaked bytes.",
         examples: [],
-        starterCode: "#include <stdio.h>\n\ndouble findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size) {\n    // Your code here\n    return 0.0;\n}"
+        starterCode: `#include <stdio.h>
+#include <stdlib.h>
+
+// Analyze the allocation pattern
+size_t count_leaked_bytes(void** allocations, int n) {
+    // Your C code here
+    return 0;
+}`
     }
 ];
 

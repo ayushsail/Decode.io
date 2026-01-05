@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Play, RotateCcw, CheckCircle, ArrowLeft } from 'lucide-react';
+import NextLink from 'next/link';
+import { Play, RotateCcw, CheckCircle, ArrowLeft, Terminal } from 'lucide-react';
 import { PUZZLES } from '../../data';
 import { useUser } from '@/context/UserContext';
-
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 
 export default function PuzzleDetail() {
     const params = useParams();
@@ -26,38 +27,38 @@ export default function PuzzleDetail() {
     if (!puzzle) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-                <h2 className="text-3xl font-bold mb-4">Puzzle Not Found</h2>
-                <Link href="/puzzles" className="text-decode-accent hover:underline">Back to Library</Link>
+                <h2 className="text-3xl font-bold mb-4 text-white">Challenge Not Found</h2>
+                <NextLink href="/puzzles">
+                    <Button variant="ghost">Back to Library</Button>
+                </NextLink>
             </div>
         );
     }
 
     const handleRun = () => {
-        setOutput("Running tests...\n> Test Case 1: Passed ✅\n> Test Case 2: Passed ✅\n> Execution time: 12ms");
+        setOutput("Compiling with gcc 12.2.0...\nRunning tests...\n> Test Case 1: Passed ✅\n> Test Case 2: Passed ✅\n> Execution time: 12ms");
     };
 
     const handleSubmit = () => {
         if (!puzzle) return;
 
-        setOutput("Submitting solution...\n> All cases passed! 🎉\n> XP Awarded: " + puzzle.xp);
+        setOutput("Submitting solution...\n> Compiling...\n> All cases passed! 🎉\n> Memory Usage: 0.4MB\n> Runtime: 2ms\n> XP Awarded: " + puzzle.xp);
         completePuzzle(puzzle.id, puzzle.xp);
-
-        // Optional: Redirect back to puzzles after delay
-        // setTimeout(() => router.push('/puzzles'), 2000);
     };
 
     return (
         <div className="flex flex-col h-[calc(100vh-8rem)]">
             {/* Header */}
             <div className="flex items-center space-x-4 mb-6">
-                <Link href="/puzzles" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition">
+                <NextLink href="/puzzles" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-decode-text-secondary hover:text-white">
                     <ArrowLeft size={20} />
-                </Link>
+                </NextLink>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{puzzle.title}</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-white">{puzzle.title}</h1>
                     <div className="flex items-center space-x-3 text-sm mt-1">
-                        <span className={`px-2 py-0.5 rounded text-xs font-bold bg-white/10 ${puzzle.difficulty === 'Hard' ? 'text-red-400' : 'text-green-400'}`}>{puzzle.difficulty}</span>
-                        <span className="text-gray-400">{puzzle.category}</span>
+                        <Badge variant={puzzle.difficulty === 'Hard' ? 'error' : 'warning'}>{puzzle.difficulty}</Badge>
+                        <Badge variant="outline">{puzzle.category}</Badge>
+                        <span className="text-decode-text-muted font-mono">+ {puzzle.xp} XP</span>
                     </div>
                 </div>
             </div>
@@ -65,40 +66,44 @@ export default function PuzzleDetail() {
             {/* Split Screen */}
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
 
-                {/* Left: Problem Description */}
-                <div className="bg-decode-blue-2/30 rounded-2xl border border-white/10 p-6 overflow-y-auto backdrop-blur-sm shadow-premium">
-                    <h3 className="text-lg font-bold mb-4 border-b border-white/10 pb-2">Description</h3>
-                    <p className="text-blue-100/80 leading-relaxed mb-6">
+                {/* Left: Problem Description - Uses standard surface */}
+                <div className="bg-decode-surface/50 rounded-2xl border border-white/5 p-6 overflow-y-auto backdrop-blur-sm shadow-premium flex flex-col">
+                    <h3 className="text-lg font-bold mb-4 border-b border-white/5 pb-2 text-white">Description</h3>
+                    <p className="text-decode-text-secondary leading-relaxed mb-8">
                         {puzzle.description}
                     </p>
 
-                    <h3 className="text-lg font-bold mb-3">Examples</h3>
+                    <h3 className="text-lg font-bold mb-3 text-white">Examples</h3>
                     <div className="space-y-4">
                         {puzzle.examples.map((ex, i) => (
-                            <div key={i} className="bg-black/20 rounded-lg p-4 font-mono text-sm border border-white/5">
-                                <div className="mb-2"><span className="text-gray-400">Input:</span> <span className="text-white">{ex.input}</span></div>
-                                <div><span className="text-gray-400">Output:</span> <span className="text-green-400">{ex.output}</span></div>
+                            <div key={i} className="bg-black/40 rounded-xl p-4 font-mono text-sm border border-white/5 relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-decode-accent/20 group-hover:bg-decode-accent transition-colors"></div>
+                                <div className="mb-2"><span className="text-decode-text-muted">Input:</span> <span className="text-white">{ex.input}</span></div>
+                                <div><span className="text-decode-text-muted">Output:</span> <span className="text-decode-success">{ex.output}</span></div>
                             </div>
                         ))}
-                        {puzzle.examples.length === 0 && <p className="text-gray-500 italic">No examples provided.</p>}
+                        {puzzle.examples.length === 0 && <p className="text-decode-text-muted italic">No examples provided.</p>}
                     </div>
                 </div>
 
-                {/* Right: Code Editor */}
-                <div className="flex flex-col bg-[#1e1e1e] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                {/* Right: Code Editor - Darker background for contrast */}
+                <div className="flex flex-col bg-[#0d1117] rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
                     {/* Editor Header */}
-                    <div className="bg-[#252526] px-4 py-2 flex items-center justify-between border-b border-white/5">
-                        <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">C (GCC 12.2.0)</div>
+                    <div className="bg-decode-surface px-4 py-2 flex items-center justify-between border-b border-white/5">
+                        <div className="flex items-center gap-2 text-xs text-decode-text-muted uppercase tracking-widest font-bold">
+                            <Terminal size={14} />
+                            <span>C (GCC 12.2.0)</span>
+                        </div>
                         <div className="flex space-x-2">
-                            <button onClick={() => setCode(puzzle.starterCode)} className="p-1.5 rounded hover:bg-white/10 transition text-gray-400 hover:text-white" title="Reset Code">
+                            <Button size="sm" variant="ghost" className="!p-1.5 h-auto text-decode-text-muted" onClick={() => setCode(puzzle.starterCode)} title="Reset Code">
                                 <RotateCcw size={14} />
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
                     {/* Editor Area (Mock) */}
                     <textarea
-                        className="flex-1 w-full bg-[#1e1e1e] text-blue-100 font-mono p-4 text-sm focus:outline-none resize-none"
+                        className="flex-1 w-full bg-[#0d1117] text-decode-text-primary font-mono p-4 text-sm focus:outline-none resize-none leading-relaxed"
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                         spellCheck={false}
@@ -106,21 +111,23 @@ export default function PuzzleDetail() {
 
                     {/* Console / Output */}
                     {output && (
-                        <div className="h-32 bg-black/40 border-t border-white/5 p-4 font-mono text-sm overflow-y-auto">
-                            <pre className="text-green-300 whitespace-pre-wrap">{output}</pre>
+                        <div className="h-40 bg-[#0d1117] border-t border-white/10 p-4 font-mono text-sm overflow-y-auto relative">
+                            <div className="absolute top-2 right-2 text-[10px] text-decode-text-muted uppercase tracking-wider">Terminal Output</div>
+                            <pre className="text-decode-success/90 whitespace-pre-wrap">{output}</pre>
                         </div>
                     )}
 
                     {/* Actions */}
-                    <div className="p-4 bg-[#252526] border-t border-white/5 flex justify-end space-x-3">
-                        <button onClick={handleRun} className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-green-600/20 text-green-400 hover:bg-green-600/30 transition border border-green-500/20 font-semibold text-sm">
-                            <Play size={16} />
-                            <span>Run Code</span>
-                        </button>
-                        <button onClick={handleSubmit} className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-decode-accent/20 text-decode-accent hover:bg-decode-accent/30 transition border border-decode-accent/20 font-semibold text-sm shadow-[0_0_15px_-3px_rgba(34,211,238,0.3)]">
-                            <CheckCircle size={16} />
-                            <span>Submit</span>
-                        </button>
+                    <div className="p-4 bg-decode-surface/50 border-t border-white/5 flex justify-end space-x-3 backdrop-blur-sm">
+                        <Button variant="secondary" size="md" onClick={handleRun} className="border-decode-success/20 hover:border-decode-success/40 text-decode-success hover:text-decode-success hover:bg-decode-success/10">
+                            <Play size={16} className="mr-2" />
+                            Run Code
+                        </Button>
+
+                        <Button variant="primary" size="md" onClick={handleSubmit} className="shadow-lg shadow-decode-primary/20">
+                            <CheckCircle size={16} className="mr-2" />
+                            Submit
+                        </Button>
                     </div>
                 </div>
             </div>

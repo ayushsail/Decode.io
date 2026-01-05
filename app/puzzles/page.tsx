@@ -1,45 +1,71 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { CATEGORIES, PUZZLES } from '../data';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import { ArrowRight, Star } from 'lucide-react';
 
 const Puzzles = () => {
     return (
-        <div className="space-y-8">
-            <header>
-                <h2 className="text-4xl font-bold mb-2 tracking-tight text-white/95 drop-shadow-md">Puzzles Library</h2>
-                <p className="text-blue-200/80 font-medium tracking-wide">Browse our collection of coding challenges.</p>
+        <div className="space-y-10">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 className="text-4xl font-bold mb-2 tracking-tight text-white drop-shadow-md">Challenge Library</h2>
+                    <p className="text-decode-text-secondary font-medium tracking-wide">Explore problems across {CATEGORIES.length} core C disciplines.</p>
+                </div>
+                {/* Optional filters could go here */}
             </header>
 
+            {/* Categories Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {CATEGORIES.map((cat, i) => (
-                    <div key={i} className="bg-decode-blue-2/50 rounded-2xl p-6 border border-white/5 hover:border-white/20 transition-all hover:bg-decode-blue-2 cursor-pointer group shadow-sm hover:shadow-premium">
-                        <div className={`w-12 h-12 rounded-xl ${cat.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                            <span className="text-xl">{cat.icon}</span>
+                    <Card key={i} className="hover:border-decode-accent/30 transition-colors group cursor-pointer" color="bg-decode-surface" noPadding>
+                        <div className="p-6 flex items-center space-x-4">
+                            <div className={`w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}>
+                                {cat.icon}
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-white group-hover:text-decode-accent transition-colors">{cat.name}</h3>
+                                <p className="text-sm text-decode-text-muted">{cat.count} Challenges</p>
+                            </div>
                         </div>
-                        <h3 className="text-xl font-bold mb-1 tracking-wide">{cat.name}</h3>
-                        <p className="text-sm text-blue-200">{cat.count} Challenges</p>
-                    </div>
+                    </Card>
                 ))}
             </div>
 
-            <h3 className="text-2xl font-bold mt-12 mb-6 tracking-wide drop-shadow-sm">Recent Challenges</h3>
-            <div className="space-y-4">
-                {PUZZLES.map((puzzle) => (
-                    <div key={puzzle.id} className="bg-black/20 p-6 rounded-2xl flex items-center justify-between border border-white/5 shadow-sm hover:shadow-md transition-all">
-                        <div>
-                            <h4 className="font-bold text-lg tracking-wide">{puzzle.title}</h4>
-                            <p className="text-sm text-gray-400">{puzzle.difficulty} • {puzzle.category} • {puzzle.xp} XP</p>
+            <section>
+                <h3 className="text-2xl font-bold mb-6 tracking-wide flex items-center gap-2">
+                    <Star className="text-decode-warning fill-decode-warning" size={24} />
+                    Featured Challenges
+                </h3>
+                <div className="space-y-4">
+                    {PUZZLES.map((puzzle) => (
+                        <div key={puzzle.id} className="group relative bg-decode-surface border border-white/5 rounded-2xl p-6 hover:border-decode-accent/20 transition-all hover:shadow-glow flex flex-col md:flex-row gap-6 md:items-center">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <Badge variant={puzzle.difficulty === 'Hard' ? 'error' : 'warning'}>{puzzle.difficulty}</Badge>
+                                    <Badge variant="outline">{puzzle.category}</Badge>
+                                    <span className="text-xs text-decode-text-muted font-mono">+ {puzzle.xp} XP</span>
+                                </div>
+                                <h4 className="text-xl font-bold text-white mb-2 group-hover:text-decode-accent transition-colors">{puzzle.title}</h4>
+                                <p className="text-sm text-decode-text-secondary line-clamp-2 md:line-clamp-1">{puzzle.description}</p>
+                            </div>
+
+                            <div className="flex-shrink-0">
+                                <NextLink href={`/puzzles/${puzzle.id}`}>
+                                    <Button variant="primary" size="md" className="shadow-none">
+                                        Solve Challenge
+                                        <ArrowRight size={18} className="ml-2" />
+                                    </Button>
+                                </NextLink>
+                            </div>
                         </div>
-                        <Link href={`/puzzles/${puzzle.id}`}>
-                            <button className="px-6 py-2 bg-decode-blue-3 rounded-xl hover:bg-white hover:text-decode-blue-1 transition font-semibold shadow-md hover:shadow-lg">
-                                Solve
-                            </button>
-                        </Link>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 };

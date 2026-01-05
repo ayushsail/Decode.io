@@ -1,20 +1,47 @@
 @import "tailwindcss";
 
 @theme {
-  --color-decode-bg: #1a1f2e;
-  --color-decode-blue-1: #2F5F8A;
-  --color-decode-blue-2: #46769B;
-  --color-decode-blue-3: #5E8CAD;
-  --color-decode-accent: #22d3ee;
+  /* Core Brand Colors */
+  --color-decode-bg: #0f1218; 
+  --color-decode-surface: #1e2433;
+  --color-decode-surface-hover: #272e40;
+  
+  --color-decode-primary: #3b82f6; /* Blue 500 */
+  --color-decode-primary-hover: #2563eb;
+  
+  --color-decode-accent: #22d3ee; /* Cyan 400 */
+  --color-decode-accent-glow: rgba(34, 211, 238, 0.5);
+  
+  --color-decode-success: #10b981;
+  --color-decode-warning: #f59e0b;
+  --color-decode-error: #ef4444;
 
+  /* Text Colors */
+  --color-decode-text-primary: #f8fafc;
+  --color-decode-text-secondary: #94a3b8;
+  --color-decode-text-muted: #64748b;
+
+  /* Helper Colors for gradients/effects */
+  --color-decode-blue-1: #1e3a8a;
+  --color-decode-blue-2: #1e40af;
+  --color-decode-blue-3: #1d4ed8;
+
+  /* Fonts */
   --font-family-sans: var(--font-inter), system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  --shadow-premium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.1);
+  /* Effects */
+  --shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 15px var(--color-decode-accent-glow);
 }
 
 @layer utilities {
   .text-shadow {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  .text-shadow-glow {
+    text-shadow: 0 0 10px var(--color-decode-accent-glow);
   }
 
   .scrollbar-hide {
@@ -25,16 +52,20 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  
+  .glass-panel {
+    @apply bg-decode-surface/50 backdrop-blur-xl border border-white/5;
+  }
 }
 
 :root {
-  --background: #1a1f2e;
-  --foreground: #ffffff;
+  --background: var(--color-decode-bg);
+  --foreground: var(--color-decode-text-primary);
 }
 
 body {
   background-color: var(--color-decode-bg);
-  color: #fff;
+  color: var(--color-decode-text-primary);
   font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

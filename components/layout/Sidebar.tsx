@@ -42,15 +42,24 @@ const Sidebar = () => {
 
                 {/* User Profile */}
                 <div className="px-6 mt-auto mb-6">
-                    <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer border border-white/5 group relative overflow-hidden">
-                        <div className="w-10 h-10 rounded-full bg-decode-primary flex items-center justify-center font-bold text-lg text-shadow-glow ring-2 ring-transparent group-hover:ring-white/20 transition-all shrink-0">
-                            {user.name.charAt(0)}
+                    {user ? (
+                        <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer border border-white/5 group relative overflow-hidden">
+                            <div className="w-10 h-10 rounded-full bg-decode-primary flex items-center justify-center font-bold text-lg text-shadow-glow ring-2 ring-transparent group-hover:ring-white/20 transition-all shrink-0">
+                                {user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="overflow-hidden relative z-10">
+                                <p className="text-sm font-semibold truncate text-decode-text-primary group-hover:text-white transition-colors">{user.name}</p>
+                                <p className="text-xs text-decode-text-muted group-hover:text-decode-text-secondary">Level {user.level} Solver</p>
+                            </div>
                         </div>
-                        <div className="overflow-hidden relative z-10">
-                            <p className="text-sm font-semibold truncate text-decode-text-primary group-hover:text-white transition-colors">{user.name}</p>
-                            <p className="text-xs text-decode-text-muted group-hover:text-decode-text-secondary">Level {user.level} Solver</p>
+                    ) : (
+                        <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+                            <p className="text-sm text-decode-text-secondary mb-2">Join the Revolution</p>
+                            <button className="w-full py-2 bg-decode-primary text-decode-bg font-bold rounded-lg hover:bg-decode-accent transition-colors text-sm shadow-glow">
+                                Sign In / Sign Up
+                            </button>
                         </div>
-                    </div>
+                    )}
                 </div>
             </aside>
         </>

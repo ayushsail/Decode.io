@@ -1,18 +1,12 @@
-'use client';
-
 import React from 'react';
-import { USERS } from '../data';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import { Trophy, Medal, Crown } from 'lucide-react';
+import { getLeaderboard } from '@/app/actions/puzzles';
 
-const Leaderboard = () => {
-    // Sort users by XP just in case
-    const sortedUsers = [...USERS].sort((a, b) => {
-        const xpA = parseInt(a.xp.replace(/,/g, ''));
-        const xpB = parseInt(b.xp.replace(/,/g, ''));
-        return xpB - xpA;
-    });
+export const dynamic = 'force-dynamic';
+
+const Leaderboard = async () => {
+    const sortedUsers = await getLeaderboard();
 
     const getRankIcon = (rank: number) => {
         if (rank === 1) return <Crown size={24} className="text-yellow-400 fill-yellow-400 drop-shadow-glow" />;
@@ -44,47 +38,48 @@ const Leaderboard = () => {
 
                 {/* Rows */}
                 <div className="divide-y divide-white/5">
-                    {sortedUsers.map((user) => (
-                        <div
-                            key={user.rank}
-                            className={`
-                                grid grid-cols-12 gap-4 px-6 py-4 items-center transition-all duration-200
-                                ${user.highlight
-                                    ? 'bg-decode-accent/10 hover:bg-decode-accent/15 border-l-4 border-decode-accent'
-                                    : 'hover:bg-white/5 border-l-4 border-transparent hover:border-white/10'
-                                }
-                            `}
-                        >
-                            <div className="col-span-2 flex justify-center items-center">
-                                {getRankIcon(user.rank)}
-                            </div>
-                            <div className="col-span-6 md:col-span-7 flex items-center space-x-4">
-                                <div className={`
-                                    w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-inner
-                                    ${user.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-amber-600 text-white ring-2 ring-yellow-400/50' :
-                                        user.highlight ? 'bg-decode-primary text-white' : 'bg-white/10 text-decode-text-secondary'}
-                                `}>
-                                    {user.name.charAt(0)}
+                    {sortedUsers.length > 0 ? (
+                        sortedUsers.map((user: any) => (
+                            <div
+                                key={user.rank}
+                                className={`
+                                    grid grid-cols-12 gap-4 px-6 py-4 items-center transition-all duration-200
+                                    hover:bg-white/5 border-l-4 border-transparent hover:border-white/10
+                                `}
+                            >
+                                <div className="col-span-2 flex justify-center items-center">
+                                    {getRankIcon(user.rank)}
                                 </div>
-                                <div className="min-w-0">
-                                    <p className={`font-bold truncate ${user.highlight ? 'text-decode-accent' : 'text-white'}`}>
-                                        {user.name}
-                                        {user.highlight && <span className="ml-2 text-[10px] uppercase bg-decode-accent text-decode-bg px-1.5 py-0.5 rounded font-bold">You</span>}
-                                    </p>
-                                    <p className="text-xs text-decode-text-muted flex items-center gap-1">
-                                        <span>{user.country}</span>
-                                        <span className="hidden md:inline">• Level {Math.floor(Math.random() * 50) + 1}</span>
-                                    </p>
+                                <div className="col-span-6 md:col-span-7 flex items-center space-x-4">
+                                    <div className={`
+                                        w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-inner
+                                        ${user.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-amber-600 text-white ring-2 ring-yellow-400/50' :
+                                            'bg-white/10 text-decode-text-secondary'}
+                                    `}>
+                                        {user.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="font-bold truncate text-white">
+                                            {user.name}
+                                        </p>
+                                        <p className="text-xs text-decode-text-muted flex items-center gap-1">
+                                            <span>{user.country || 'Global'}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="col-span-4 md:col-span-3 text-right">
+                                    <span className="font-mono font-bold text-lg text-decode-success">
+                                        {user.xp}
+                                    </span>
+                                    <span className="text-xs text-decode-text-muted ml-1">XP</span>
                                 </div>
                             </div>
-                            <div className="col-span-4 md:col-span-3 text-right">
-                                <span className={`font-mono font-bold text-lg ${user.highlight ? 'text-decode-accent' : 'text-decode-success'}`}>
-                                    {user.xp}
-                                </span>
-                                <span className="text-xs text-decode-text-muted ml-1">XP</span>
-                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-10 text-decode-text-muted">
+                            No active players yet. Be the first!
                         </div>
-                    ))}
+                    )}
                 </div>
             </Card>
         </div>

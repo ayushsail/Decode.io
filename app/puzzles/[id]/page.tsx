@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import NextLink from 'next/link';
 import { Play, RotateCcw, CheckCircle, ArrowLeft, Terminal } from 'lucide-react';
-import { PUZZLES } from '../../data';
+import { getPuzzleById, submitPuzzleSolution } from '@/app/actions/puzzles';
 import { useUser } from '@/context/UserContext';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -15,14 +15,31 @@ export default function PuzzleDetail() {
     const { completePuzzle } = useUser();
     const [code, setCode] = useState("");
     const [output, setOutput] = useState<string | null>(null);
-
-    const puzzle = PUZZLES.find(p => p.id === params.id);
+    const [puzzle, setPuzzle] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (puzzle) {
-            setCode(puzzle.starterCode);
+        async function fetchPuzzle() {
+            if (params.id) {
+                try {
+                    const data = await getPuzzleById(params.id as string);
+                    if (data) {
+                        setPuzzle(data);
+                        setCode(data.starter_code || "");
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    setLoading(false);
+                }
+            }
         }
-    }, [puzzle]);
+        fetchPuzzle();
+    }, [params.id]);
+
+    if (loading) {
+        return <div className="flex justify-center items-center h-[60vh] text-white">Loading challenge...</div>;
+    }
 
     if (!puzzle) {
         return (
@@ -39,11 +56,18 @@ export default function PuzzleDetail() {
         setOutput("Compiling with gcc 12.2.0...\nRunning tests...\n> Test Case 1: Passed ✅\n> Test Case 2: Passed ✅\n> Execution time: 12ms");
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!puzzle) return;
 
-        setOutput("Submitting solution...\n> Compiling...\n> All cases passed! 🎉\n> Memory Usage: 0.4MB\n> Runtime: 2ms\n> XP Awarded: " + puzzle.xp);
-        completePuzzle(puzzle.id, puzzle.xp);
+        setOutput("Submitting solution...\n> Compiling...");
+        const result = await submitPuzzleSolution(puzzle.id, code);
+
+        if (result.success) {
+            setOutput(prev => prev + `\n> All cases passed! 🎉\n> Memory Usage: 0.4MB\n> Runtime: ${result.executionTime}ms\n> XP Awarded: ${puzzle.xp_reward}`);
+            completePuzzle(puzzle.id, puzzle.xp_reward);
+        } else {
+            setOutput(prev => prev + `\n> Error: ${result.error}`);
+        }
     };
 
     return (
@@ -58,7 +82,7 @@ export default function PuzzleDetail() {
                     <div className="flex items-center space-x-3 text-sm mt-1">
                         <Badge variant={puzzle.difficulty === 'Hard' ? 'error' : 'warning'}>{puzzle.difficulty}</Badge>
                         <Badge variant="outline">{puzzle.category}</Badge>
-                        <span className="text-decode-text-muted font-mono">+ {puzzle.xp} XP</span>
+                        <span className="text-decode-text-muted font-mono">+ {puzzle.xp_reward} XP</span>
                     </div>
                 </div>
             </div>
@@ -75,14 +99,18 @@ export default function PuzzleDetail() {
 
                     <h3 className="text-lg font-bold mb-3 text-white">Examples</h3>
                     <div className="space-y-4">
-                        {puzzle.examples.map((ex, i) => (
-                            <div key={i} className="bg-black/40 rounded-xl p-4 font-mono text-sm border border-white/5 relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-decode-accent/20 group-hover:bg-decode-accent transition-colors"></div>
-                                <div className="mb-2"><span className="text-decode-text-muted">Input:</span> <span className="text-white">{ex.input}</span></div>
-                                <div><span className="text-decode-text-muted">Output:</span> <span className="text-decode-success">{ex.output}</span></div>
-                            </div>
-                        ))}
-                        {puzzle.examples.length === 0 && <p className="text-decode-text-muted italic">No examples provided.</p>}
+                        {/* We handle test_cases primarily if examples array is missing, but structure might differ in DB vs mock */}
+                        {puzzle.test_cases && puzzle.test_cases.length > 0 ? (
+                            puzzle.test_cases.map((ex: any, i: number) => (
+                                <div key={i} className="bg-black/40 rounded-xl p-4 font-mono text-sm border border-white/5 relative overflow-hidden group">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-decode-accent/20 group-hover:bg-decode-accent transition-colors"></div>
+                                    <div className="mb-2"><span className="text-decode-text-muted">Input:</span> <span className="text-white">{ex.input}</span></div>
+                                    <div><span className="text-decode-text-muted">Output:</span> <span className="text-decode-success">{ex.output}</span></div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-decode-text-muted italic">No examples provided in database.</p>
+                        )}
                     </div>
                 </div>
 
@@ -95,7 +123,7 @@ export default function PuzzleDetail() {
                             <span>C (GCC 12.2.0)</span>
                         </div>
                         <div className="flex space-x-2">
-                            <Button size="sm" variant="ghost" className="!p-1.5 h-auto text-decode-text-muted" onClick={() => setCode(puzzle.starterCode)} title="Reset Code">
+                            <Button size="sm" variant="ghost" className="!p-1.5 h-auto text-decode-text-muted" onClick={() => setCode(puzzle.starter_code || "")} title="Reset Code">
                                 <RotateCcw size={14} />
                             </Button>
                         </div>

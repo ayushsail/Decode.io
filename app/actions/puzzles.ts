@@ -19,7 +19,7 @@ export async function getPuzzles() {
 }
 
 export async function submitPuzzleSolution(puzzleId: string, code: string) {
-    constKF supabase = createClient()
+    const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -49,4 +49,44 @@ export async function submitPuzzleSolution(puzzleId: string, code: string) {
     }
 
     return { success: true, status, executionTime }
+}
+
+export async function getPuzzleById(id: string) {
+    const supabase = createClient()
+
+    const { data: puzzle, error } = await supabase
+        .from('puzzles')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+    if (error) {
+        console.error('Error fetching puzzle:', error)
+        return null
+    }
+
+    return puzzle
+}
+
+export async function getLeaderboard() {
+    const supabase = createClient()
+
+    const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('username, xp, country, avatar_url') // Assuming 'country' exists or we mock it in query if not in schema
+        .order('xp', { ascending: false })
+        .limit(50)
+
+    if (error) {
+        console.error('Error fetching leaderboard:', error)
+        return []
+    }
+
+    return profiles.map((p: any, index: number) => ({
+        rank: index + 1,
+        name: p.username || 'Anonymous',
+        xp: p.xp?.toLocaleString() || '0',
+        country: 'Unknown', // Schema didn't have country, defaulting
+        highlight: false // Logic to highlight current user can be added if we pass currentUserId
+    }))
 }

@@ -1,14 +1,17 @@
-'use client';
-
 import React from 'react';
 import NextLink from 'next/link';
-import { CATEGORIES, PUZZLES } from '../data';
+import { CATEGORIES } from '../data'; // Categories might still be static for now, or fetched.
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { ArrowRight, Star } from 'lucide-react';
+import { getPuzzles } from '../actions/puzzles';
 
-const Puzzles = () => {
+export const dynamic = 'force-dynamic';
+
+const Puzzles = async () => {
+    const puzzles = await getPuzzles();
+
     return (
         <div className="space-y-10">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -19,7 +22,7 @@ const Puzzles = () => {
                 {/* Optional filters could go here */}
             </header>
 
-            {/* Categories Grid */}
+            {/* Categories Grid - Static for now */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {CATEGORIES.map((cat, i) => (
                     <Card key={i} className="hover:border-decode-accent/30 transition-colors group cursor-pointer" color="bg-decode-surface" noPadding>
@@ -42,28 +45,34 @@ const Puzzles = () => {
                     Featured Challenges
                 </h3>
                 <div className="space-y-4">
-                    {PUZZLES.map((puzzle) => (
-                        <div key={puzzle.id} className="group relative bg-decode-surface border border-white/5 rounded-2xl p-6 hover:border-decode-accent/20 transition-all hover:shadow-glow flex flex-col md:flex-row gap-6 md:items-center">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <Badge variant={puzzle.difficulty === 'Hard' ? 'error' : 'warning'}>{puzzle.difficulty}</Badge>
-                                    <Badge variant="outline">{puzzle.category}</Badge>
-                                    <span className="text-xs text-decode-text-muted font-mono">+ {puzzle.xp} XP</span>
+                    {puzzles && puzzles.length > 0 ? (
+                        puzzles.map((puzzle: any) => (
+                            <div key={puzzle.id} className="group relative bg-decode-surface border border-white/5 rounded-2xl p-6 hover:border-decode-accent/20 transition-all hover:shadow-glow flex flex-col md:flex-row gap-6 md:items-center">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Badge variant={puzzle.difficulty === 'Hard' ? 'error' : 'warning'}>{puzzle.difficulty}</Badge>
+                                        <Badge variant="outline">{puzzle.category}</Badge>
+                                        <span className="text-xs text-decode-text-muted font-mono">+ {puzzle.xp_reward || puzzle.xp} XP</span>
+                                    </div>
+                                    <h4 className="text-xl font-bold text-white mb-2 group-hover:text-decode-accent transition-colors">{puzzle.title}</h4>
+                                    <p className="text-sm text-decode-text-secondary line-clamp-2 md:line-clamp-1">{puzzle.description}</p>
                                 </div>
-                                <h4 className="text-xl font-bold text-white mb-2 group-hover:text-decode-accent transition-colors">{puzzle.title}</h4>
-                                <p className="text-sm text-decode-text-secondary line-clamp-2 md:line-clamp-1">{puzzle.description}</p>
-                            </div>
 
-                            <div className="flex-shrink-0">
-                                <NextLink href={`/puzzles/${puzzle.id}`}>
-                                    <Button variant="primary" size="md" className="shadow-none">
-                                        Solve Challenge
-                                        <ArrowRight size={18} className="ml-2" />
-                                    </Button>
-                                </NextLink>
+                                <div className="flex-shrink-0">
+                                    <NextLink href={`/puzzles/${puzzle.id}`}>
+                                        <Button variant="primary" size="md" className="shadow-none">
+                                            Solve Challenge
+                                            <ArrowRight size={18} className="ml-2" />
+                                        </Button>
+                                    </NextLink>
+                                </div>
                             </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-10 text-decode-text-muted">
+                            No puzzles found. Check your database connection!
                         </div>
-                    ))}
+                    )}
                 </div>
             </section>
         </div>

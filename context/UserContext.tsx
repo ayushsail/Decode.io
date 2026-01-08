@@ -85,9 +85,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
 
     const login = async () => {
-        // For now, simple redirect or logic
-        // await supabase.auth.signInWithOAuth(...)
-        console.log("Login clicked (Implement Auth UI)");
+        router.push('/login');
     };
 
     return (

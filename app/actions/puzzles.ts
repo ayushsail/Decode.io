@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 
 export async function getPuzzles() {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: puzzles, error } = await supabase
         .from('puzzles')
@@ -19,7 +19,7 @@ export async function getPuzzles() {
 }
 
 export async function submitPuzzleSolution(puzzleId: string, code: string) {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -52,7 +52,7 @@ export async function submitPuzzleSolution(puzzleId: string, code: string) {
 }
 
 export async function getPuzzleById(id: string) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: puzzle, error } = await supabase
         .from('puzzles')
@@ -69,7 +69,7 @@ export async function getPuzzleById(id: string) {
 }
 
 export async function getLeaderboard() {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data: profiles, error } = await supabase
         .from('profiles')

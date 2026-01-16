@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Mail, Lock, User, Terminal, Loader2 } from 'lucide-react';
+import { useUser } from '@/context/UserContext';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -17,43 +17,30 @@ export default function LoginPage() {
     const [username, setUsername] = useState(''); // Only for signup
 
     const router = useRouter();
-    const supabase = createClient();
+    const { login } = useUser();
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
-        try {
-            if (isLogin) {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-                router.push('/');
-                router.refresh();
-            } else {
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            username: username, // Adding metadata to be picked up by trigger
-                        },
-                    },
-                });
-                if (error) throw error;
-                // On success, maybe show message to check email if confirm enabled
-                // For now, assume auto-confirm or successful creation
-                router.push('/');
-                router.refresh();
+        // Simulate network delay for realism
+        setTimeout(() => {
+            try {
+                if (isLogin) {
+                    // Mock Login
+                    if (!email || !password) throw new Error("Credentials required");
+                    login(email);
+                } else {
+                    // Mock Signup
+                    if (!email || !password || !username) throw new Error("All fields required");
+                    login(email, username);
+                }
+            } catch (err: any) {
+                setError(err.message);
+                setLoading(false);
             }
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
+        }, 1500);
     };
 
     return (

@@ -1,0 +1,53 @@
+**Role:**
+You are a Senior Systems Architect and C Programming Expert for "Decode.io".
+
+**Context & Theme:**
+You must generate puzzles centered around the following specific theme:
+**👉 THEME: [INSERT CREATIVE THEME HERE]**
+*(Examples: "Embedded Mars Rover Systems", "High-Frequency Trading Engine", "Retro Game Boy Emulator", "Cybersecurity Kernel Patches", "Smart City Traffic Control")*
+
+**Task:**
+Generate a master JSON dataset of **30 unique C programming puzzles**.
+All problem descriptions, function names, and variable names **MUST FLAVOR** the code with the chosen **THEME**.
+You must generate exactly **5 problems** for EACH of the following 6 categories:
+
+1. **Algorithms** (Focus: Sorting, Searching, Graph, Dynamic Programming)
+2. **Data Structures** (Focus: Linked Lists, Trees, Stacks, Queues)
+3. **Memory Management** (Focus: Malloc/Free, Leaks, Buffer management)
+4. **System Programming** (Focus: File I/O, Signals, Process Control, Low-level OS interaction)
+5. **Pointers & Arrays** (Focus: Pointer arithmetic, Double pointers, Multi-dimensional arrays)
+6. **Bit Manipulation** (Focus: Bitwise operators, Masks, Binary logic)
+
+**Difficulty Progression:**
+For *each* category, the 5 problems must scale in difficulty:
+1. **Entry** (Basic concept check)
+2. **Junior** (Standard implementation)
+3. **Senior** (Complex logic or optimization required)
+4. **Expert** (Edge cases, intricate memory handling)
+5. **Master** (Architectural challenge, highly optimized)
+
+**Constraints & Quality Control:**
+- **Language:** Strict **C11 Standard**. NO C++ features (no `iostream`, `new`, `class`, `reference params`).
+- **Thematic Consistency:** Do NOT generate generic "Find X in Array" problems. Instead, generate "Find Malfunctioning Sensor ID in SensorArray".
+- **Anti-Repetition:** **BANNED** standard problems: Fibonacci, Factorial, Two Sum, Reverse Linked List, Bubble Sort. (Unless heavily modified to fit a complex edge case).
+- **Memory Safety:** Solutions must be robust.
+- **Output:** A SINGLE valid JSON array containing all 30 objects.
+
+**JSON Structure (Strict Array of Objects):**
+[
+  {
+    "title": "Thematic Problem Title",
+    "difficulty": "Easy", 
+    "category": "Algorithms",
+    "xp": 100, 
+    "description": "Problem description using the THEME's context...",
+    "starterCode": "#include <stdio.h>\n\n// TODO: Solve for [Theme Context]\nvoid solve() {\n    // Code here\n}",
+    "testCases": [
+      { "input": "...", "output": "..." }
+    ]
+  },
+  ...
+]
+
+**Action:**
+Generate the full JSON array now for the Theme: **[INSERT CREATIVE THEME HERE]**.

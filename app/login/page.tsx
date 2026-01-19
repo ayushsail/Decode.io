@@ -6,7 +6,8 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Mail, Lock, User, Terminal, Loader2 } from 'lucide-react';
-import { useUser } from '@/context/UserContext';
+import { createClient } from '@/utils/supabase/client';
+import { toast } from 'react-hot-toast';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -14,33 +15,48 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [username, setUsername] = useState(''); // Only for signup
+    const [fullName, setFullName] = useState('');
 
     const router = useRouter();
-    const { login } = useUser();
+    const supabase = createClient();
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
-        // Simulate network delay for realism
-        setTimeout(() => {
-            try {
-                if (isLogin) {
-                    // Mock Login
-                    if (!email || !password) throw new Error("Credentials required");
-                    login(email);
-                } else {
-                    // Mock Signup
-                    if (!email || !password || !username) throw new Error("All fields required");
-                    login(email, username);
-                }
-            } catch (err: any) {
-                setError(err.message);
+        try {
+            if (isLogin) {
+                // Real Login
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+                if (signInError) throw signInError;
+                toast.success('Access Granted. Welcome back, agent.');
+                router.push('/');
+            } else {
+                // Real Signup
+                const { error: signUpError } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                        }
+                    }
+                });
+                if (signUpError) throw signUpError;
+                toast.success('Registration Initiated. Check your secure uplink (email).');
+                setError('Registration successful! Please check your email for verification.');
                 setLoading(false);
             }
-        }, 1500);
+        } catch (err: any) {
+            const msg = err.message || 'An error occurred during authentication';
+            setError(msg);
+            toast.error(msg);
+            setLoading(false);
+        }
     };
 
     return (
@@ -61,11 +77,11 @@ export default function LoginPage() {
 
                         {!isLogin && (
                             <Input
-                                label="Username"
-                                placeholder="neo_101"
+                                label="Full Name"
+                                placeholder="Neo Anderson"
                                 icon={<User size={18} />}
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
                                 required
                             />
                         )}
@@ -91,7 +107,10 @@ export default function LoginPage() {
                         />
 
                         {error && (
-                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400 text-center">
+                            <div className={`p-3 border rounded-lg text-sm text-center ${error.includes('successful')
+                                ? 'bg-green-500/10 border-green-500/20 text-green-400'
+                                : 'bg-red-500/10 border-red-500/20 text-red-400'
+                                }`}>
                                 {error}
                             </div>
                         )}

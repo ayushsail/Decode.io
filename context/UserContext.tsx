@@ -2,90 +2,103 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
-type User = {
-    id?: string;
-    name: string;
-    email: string;
+type UserProfile = {
+    id: string;
+    username: string;
+    full_name: string;
+    avatar_url: string;
     xp: number;
     level: number;
-    completedPuzzles: string[];
+    completed_puzzles: string[]; // We'll need to fetch this or derive from submissions
 };
 
 type UserContextType = {
-    user: User | null;
+    user: UserProfile | null;
+    supabaseUser: SupabaseUser | null;
     isLoading: boolean;
-    updateUser: (updates: Partial<User>) => void;
-    completePuzzle: (puzzleId: string, xpReward: number) => void;
-    login: (email: string, name?: string) => void;
-    logout: () => void;
+    refreshProfile: () => Promise<void>;
+    logout: () => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserProfile | null>(null);
+    const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+    const supabase = createClient();
+
+    const fetchProfile = async (uid: string) => {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', uid)
+            .single();
+
+        if (error) {
+            console.error('Error fetching profile:', error);
+            return null;
+        }
+
+        // Also fetch completed puzzle IDs from submissions
+        const { data: submissions } = await supabase
+            .from('submissions')
+            .select('puzzle_id')
+            .eq('user_id', uid)
+            .eq('status', 'Passed');
+
+        const completed_puzzles = submissions ? submissions.map(s => s.puzzle_id) : [];
+
+        return { ...data, completed_puzzles };
+    };
+
+    const refreshProfile = async () => {
+        if (!supabaseUser) return;
+        const profile = await fetchProfile(supabaseUser.id);
+        setUser(profile);
+    };
 
     useEffect(() => {
-        // Load from localStorage on mount
-        const saved = localStorage.getItem('decode-app-user');
-        if (saved) {
-            try {
-                setUser(JSON.parse(saved));
-            } catch (e) {
-                console.error("Failed to load user data", e);
+        const initializeAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            setSupabaseUser(session?.user ?? null);
+
+            if (session?.user) {
+                const profile = await fetchProfile(session.user.id);
+                setUser(profile);
             }
-        }
-        setIsLoading(false);
+            setIsLoading(false);
+        };
+
+        initializeAuth();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            setSupabaseUser(session?.user ?? null);
+            if (session?.user) {
+                const profile = await fetchProfile(session.user.id);
+                setUser(profile);
+            } else {
+                setUser(null);
+            }
+            setIsLoading(false);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
-    // Persist user changes
-    useEffect(() => {
-        if (user) {
-            localStorage.setItem('decode-app-user', JSON.stringify(user));
-        } else if (!isLoading) {
-            localStorage.removeItem('decode-app-user');
-        }
-    }, [user, isLoading]);
-
-    const updateUser = (updates: Partial<User>) => {
-        if (!user) return;
-        setUser(prev => prev ? ({ ...prev, ...updates }) : null);
-    };
-
-    const completePuzzle = (puzzleId: string, xpReward: number) => {
-        if (!user) return;
-        if (user.completedPuzzles.includes(puzzleId)) return;
-
-        setUser(prev => prev ? ({
-            ...prev,
-            xp: prev.xp + xpReward,
-            completedPuzzles: [...prev.completedPuzzles, puzzleId]
-        }) : null);
-    };
-
-    const login = (email: string, name?: string) => {
-        const newUser: User = {
-            id: 'local-' + Date.now(),
-            name: name || email.split('@')[0],
-            email: email,
-            xp: 0,
-            level: 1,
-            completedPuzzles: []
-        };
-        setUser(newUser);
-        router.push('/');
-    };
-
-    const logout = () => {
+    const logout = async () => {
+        await supabase.auth.signOut();
         setUser(null);
+        setSupabaseUser(null);
         router.push('/login');
     };
 
     return (
-        <UserContext.Provider value={{ user, isLoading, updateUser, completePuzzle, login, logout }}>
+        <UserContext.Provider value={{ user, supabaseUser, isLoading, refreshProfile, logout }}>
             {children}
         </UserContext.Provider>
     );

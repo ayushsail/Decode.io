@@ -51,6 +51,33 @@ export async function submitPuzzleSolution(puzzleId: string, code: string) {
     return { success: true, status, executionTime }
 }
 
+export async function awardXP(amount: number) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('xp')
+        .eq('id', user.id)
+        .single()
+
+    if (profileError) return { error: 'Profile not found' }
+
+    const newXP = (profile.xp || 0) + amount
+    const newLevel = Math.floor(newXP / 1000) + 1
+
+    const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ xp: newXP, level: newLevel })
+        .eq('id', user.id)
+
+    if (updateError) return { error: 'Failed to update XP' }
+
+    return { success: true, newXP, newLevel }
+}
+
 export async function getPuzzleById(id: string) {
     const supabase = await createClient()
 

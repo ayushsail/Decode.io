@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // Keep Inter or switch to JetBrains if desired for main? Request says "Typography" might change but Inter is safe for UI.
+import { Outfit } from "next/font/google"; // Keep Inter or switch to JetBrains if desired for main? Request says "Typography" might change but Inter is safe for UI.
 import "./globals.css";
 import Sidebar from "@/components/layout/Sidebar";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { UserProvider } from "@/context/UserContext";
+import { Toaster } from 'react-hot-toast';
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: "DeCode.io",
@@ -19,8 +20,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans min-h-screen bg-decode-bg text-decode-text-primary antialiased flex flex-col selection:bg-decode-accent/30 selection:text-decode-accent`}>
+      <body className={`${outfit.variable} font-sans min-h-screen bg-decode-bg text-decode-text-primary antialiased flex flex-col selection:bg-decode-accent/30 selection:text-decode-accent`}>
         <UserProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              className: 'bg-decode-surface text-white border border-white/10',
+              duration: 4000,
+            }}
+          />
           {/* Main Content Wrapper */}
           <main className="flex-1 relative overflow-hidden flex flex-col h-screen md:pl-72">
             {/* Background - Deep Aesthetic */}

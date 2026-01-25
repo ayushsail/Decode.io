@@ -7,7 +7,7 @@ export async function getPuzzles() {
 
     const { data: puzzles, error } = await supabase
         .from('puzzles')
-        .select('*')
+        .select('id, title, description, difficulty, category, xp_reward, created_at')
         .order('created_at', { ascending: false })
 
     if (error) {

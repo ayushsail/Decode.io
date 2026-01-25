@@ -1,16 +1,23 @@
 import React from 'react';
 import { getPuzzles } from './actions/puzzles';
+import { getUserData } from './actions/user';
 import DashboardClient from './DashboardClient';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Cache puzzles for 1 hour
 
 export default async function Home() {
-  const puzzles = await getPuzzles();
+  // Parallel fetch for speed
+  const [puzzles, userData] = await Promise.all([
+    getPuzzles(),
+    getUserData()
+  ]);
+
+  if (!userData) {
+    redirect('/login');
+  }
 
   return (
-    <ProtectedRoute>
-      <DashboardClient puzzles={puzzles} />
-    </ProtectedRoute>
+    <DashboardClient puzzles={puzzles} initialUser={userData} />
   );
 }

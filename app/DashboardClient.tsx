@@ -10,9 +10,12 @@ import { useUser } from '@/context/UserContext';
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
-export default function DashboardClient({ puzzles }: { puzzles: any[] }) {
+export default function DashboardClient({ puzzles, initialUser }: { puzzles: any[], initialUser?: any }) {
     const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('Easy');
-    const { user } = useUser();
+    const { user: contextUser } = useUser();
+
+    // Prefer context user if available (updates), otherwise use initial server-side user
+    const user = contextUser || initialUser;
 
     // Group puzzles by difficulty
     const groupedPuzzles = {
@@ -60,8 +63,8 @@ export default function DashboardClient({ puzzles }: { puzzles: any[] }) {
                         key={diff}
                         onClick={() => setSelectedDifficulty(diff)}
                         className={`px-8 py-3 rounded-xl font-bold transition-all duration-300 ${selectedDifficulty === diff
-                                ? 'bg-decode-primary text-white shadow-glow'
-                                : 'text-decode-text-muted hover:text-white hover:bg-white/5'
+                            ? 'bg-decode-primary text-white shadow-glow'
+                            : 'text-decode-text-muted hover:text-white hover:bg-white/5'
                             }`}
                     >
                         {diff}

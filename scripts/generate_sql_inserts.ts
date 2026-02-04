@@ -1,28 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
-import * as path from 'path';
 
-// Helper to generate slug
 const slugify = (text: string) => text.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-
-// Manual .env.local loader since we are running outside Next.js
-const envPath = path.resolve(process.cwd(), '.env.local');
-const envContent = fs.readFileSync(envPath, 'utf8');
-const env: Record<string, string> = {};
-envContent.split('\n').forEach(line => {
-    const [key, value] = line.split('=');
-    if (key && value) env[key.trim()] = value.trim();
-});
-
-const supabaseUrl = env['NEXT_PUBLIC_SUPABASE_URL'];
-const supabaseKey = env['SUPABASE_SERVICE_ROLE_KEY'] || env['NEXT_PUBLIC_SUPABASE_ANON_KEY'];
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase credentials in .env.local');
-    process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const puzzlesData = [
     {
@@ -360,38 +338,23 @@ const puzzlesData = [
     }
 ];
 
-async function seedPuzzles() {
-    console.log('Starting seeding...');
+const escapeSql = (str: string) => str.replace(/'/g, "''");
 
-    // Clear existing puzzles to remove junk/test data
-    const { error: deleteError } = await supabase.from('puzzles').delete().neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
-    if (deleteError) {
-        console.error('Error clearing old puzzles:', deleteError);
-    } else {
-        console.log('Cleared existing puzzles.');
-    }
+const sqlStatements = puzzlesData.map(p => {
+    const title = escapeSql(p.title);
+    const slug = slugify(p.title);
+    const description = escapeSql(p.description);
+    const difficulty = escapeSql(p.difficulty);
+    const category = escapeSql(p.category);
+    const starter_code = escapeSql(p.starter_code);
+    const test_cases = escapeSql(JSON.stringify(p.test_cases));
 
-    const formattedPuzzles = puzzlesData.map(p => ({
-        title: p.title,
-        slug: slugify(p.title),
-        description: p.description,
-        difficulty: p.difficulty,
-        category: p.category,
-        starter_code: p.starter_code,
-        test_cases: p.test_cases, // Supabase-js handles JSON conversion
-        xp_reward: p.xp,
-        is_ai_generated: true
-    }));
-
-    const { data, error } = await supabase.from('puzzles').insert(formattedPuzzles);
-
-    if (error) {
-        console.error('Error seeding puzzles:', error);
-    } else {
-        console.log('Successfully seeded 30 puzzles!');
-    }
-}
-
-seedPuzzles().catch(err => {
-    console.error('Seed runtime error:', err);
+    return `INSERT INTO puzzles (title, slug, description, difficulty, category, starter_code, test_cases, xp_reward, is_ai_generated) VALUES ('${title}', '${slug}', '${description}', '${difficulty}', '${category}', '${starter_code}', '${test_cases}', ${p.xp}, true);`;
 });
+
+const chunkSize = 5;
+for (let i = 0; i < sqlStatements.length; i += chunkSize) {
+    const chunk = sqlStatements.slice(i, i + chunkSize);
+    fs.writeFileSync(`seed_chunk_${(i / chunkSize) + 1}.sql`, chunk.join('\n'));
+    console.log(`Generated seed_chunk_${(i / chunkSize) + 1}.sql`);
+}

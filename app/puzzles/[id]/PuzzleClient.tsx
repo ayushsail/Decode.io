@@ -7,7 +7,12 @@ import { submitPuzzleSolution, awardXP } from '@/app/actions/puzzles';
 import { useUser } from '@/context/UserContext';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import Editor from '@monaco-editor/react';
+import dynamic from 'next/dynamic';
+
+const Editor = dynamic(() => import('@monaco-editor/react'), {
+    ssr: false,
+    loading: () => <div className="h-full w-full flex items-center justify-center text-decode-text-muted"><Loader2 className="animate-spin" /></div>
+});
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 

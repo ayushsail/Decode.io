@@ -27,9 +27,11 @@ const Sidebar = () => {
             <aside className="hidden md:flex fixed top-0 left-0 h-screen w-72 bg-decode-bg/50 backdrop-blur-md border-r border-white/5 flex-col py-8 z-40">
                 {/* Logo */}
                 <div className="px-8 mb-12">
-                    <h1 className="text-2xl font-bold tracking-tight text-white drop-shadow-md whitespace-nowrap font-mono">
-                        DeCode<span className="text-decode-accent">.io</span>
-                    </h1>
+                    <a href="/" className="block hover:opacity-80 transition-opacity" title="Reload Dashboard">
+                        <h1 className="text-2xl font-bold tracking-tight text-white drop-shadow-md whitespace-nowrap font-mono">
+                            DeCode<span className="text-decode-accent">.io</span>
+                        </h1>
+                    </a>
                 </div>
 
                 {/* Navigation */}

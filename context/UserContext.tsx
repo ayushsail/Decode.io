@@ -30,7 +30,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
 
     const fetchProfile = async (uid: string) => {
         const { data, error } = await supabase
@@ -56,11 +56,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         return { ...data, completed_puzzles };
     };
 
-    const refreshProfile = async () => {
+    const refreshProfile = React.useCallback(async () => {
         if (!supabaseUser) return;
         const profile = await fetchProfile(supabaseUser.id);
         setUser(profile);
-    };
+    }, [supabaseUser]);
 
     useEffect(() => {
         const initializeAuth = async () => {
@@ -90,15 +90,23 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe();
     }, []);
 
-    const logout = async () => {
+    const logout = React.useCallback(async () => {
         await supabase.auth.signOut();
         setUser(null);
         setSupabaseUser(null);
         router.push('/login');
-    };
+    }, [router, supabase]);
+
+    const value = React.useMemo(() => ({
+        user,
+        supabaseUser,
+        isLoading,
+        refreshProfile,
+        logout
+    }), [user, supabaseUser, isLoading, refreshProfile, logout]);
 
     return (
-        <UserContext.Provider value={{ user, supabaseUser, isLoading, refreshProfile, logout }}>
+        <UserContext.Provider value={value}>
             {children}
         </UserContext.Provider>
     );

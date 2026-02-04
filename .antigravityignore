@@ -1,0 +1,10 @@
+public/assets/
+**/*.min.js
+dist/
+.next/
+build/
+node_modules/
+.git/
+.vscode/
+coverage/
+*.log

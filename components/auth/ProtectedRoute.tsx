@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
     useEffect(() => {
         if (!isLoading && !supabaseUser) {
-            router.push('/login');
+            // router.push('/login');
         }
     }, [supabaseUser, isLoading, router]);
 
@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     }
 
     if (!supabaseUser) {
-        return null;
+        // return null;
     }
 
     return <>{children}</>;

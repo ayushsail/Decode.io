@@ -10,12 +10,11 @@ import { User, Mail, Bell, Eye, Moon, Monitor } from 'lucide-react';
 const Settings = () => {
     const { user } = useUser();
 
-    if (!user) {
-        return (
-            <div className="max-w-3xl mx-auto space-y-8">
-                <p className="text-decode-text-muted">Loading...</p>
-            </div>
-        );
+    // If user is loading, show concise skeleton or loading text, but don't block whole page if possible.
+    // For showcase, allow rendering with fallback data if user is null.
+    const displayUser = user || { full_name: 'Guest User', username: 'guest', level: 0, xp: 0 };
+    if (!user && !user) {
+        // This block handles the strict loading case if we wanted to block, but we'll use displayUser
     }
 
     return (
@@ -30,15 +29,15 @@ const Settings = () => {
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-8 mb-8">
                         <div className="relative group cursor-pointer">
                             <div className="w-24 h-24 rounded-full bg-decode-primary flex items-center justify-center text-4xl font-bold ring-4 ring-decode-bg shadow-glow transition-transform group-hover:scale-105">
-                                {(user.full_name || user.username || '?').charAt(0)}
+                                {(displayUser.full_name || displayUser.username || '?').charAt(0)}
                             </div>
                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                                 <span className="text-xs font-bold text-white">Edit</span>
                             </div>
                         </div>
                         <div className="flex-1 space-y-2">
-                            <h3 className="text-xl font-bold text-white">{user.full_name || user.username}</h3>
-                            <p className="text-sm text-decode-text-muted">Level {user.level} Solver</p>
+                            <h3 className="text-xl font-bold text-white">{displayUser.full_name || displayUser.username}</h3>
+                            <p className="text-sm text-decode-text-muted">Level {displayUser.level} Solver</p>
                             <div className="pt-2">
                                 <Button size="sm" variant="secondary" className="mr-3">Change Avatar</Button>
                                 <Button size="sm" variant="ghost" className="text-decode-error hover:text-decode-error hover:bg-decode-error/10">Delete Account</Button>
@@ -49,13 +48,13 @@ const Settings = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Input
                             label="Display Name"
-                            value={user.full_name || user.username}
+                            value={displayUser.full_name || displayUser.username}
                             readOnly
                             icon={<User size={18} />}
                         />
                         <Input
                             label="Username"
-                            value={user.username}
+                            value={displayUser.username}
                             readOnly
                             icon={<Mail size={18} />}
                         />

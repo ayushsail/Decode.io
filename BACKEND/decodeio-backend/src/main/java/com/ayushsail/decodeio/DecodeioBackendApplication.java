@@ -1,0 +1,13 @@
+package com.ayushsail.decodeio;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DecodeioBackendApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DecodeioBackendApplication.class, args);
+	}
+
+}

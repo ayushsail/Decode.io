@@ -78,6 +78,20 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- below dependencies add by me -->
+		<!-- Hibernate won't automatically create our tables. -->
+		<!-- using Flyway to manage database schema changes through versioned SQL files. -->
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-flyway</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

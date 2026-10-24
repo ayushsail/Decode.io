@@ -80,7 +80,7 @@
 		</dependency>
 		
 		<!-- below dependencies add by me -->
-		<!-- Hibernate won't automatically create our tables. -->
+		<!-- Hibernate will not automatically create our tables. -->
 		<!-- using Flyway to manage database schema changes through versioned SQL files. -->
 		<dependency>
     		<groupId>org.springframework.boot</groupId>
